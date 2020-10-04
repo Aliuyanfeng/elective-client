@@ -1,8 +1,8 @@
 <template>
   <div class="schedule_container">
-    <Aside style="float:left"></Aside>
+  
     <div class="schedule_wrap">
-      <el-table :data="tableData" border stripe style="width: 70%;" class="table">
+      <el-table :data="tableData" border stripe style="width: 100%;" class="table">
         <el-table-column prop="cname" label="课程" width="180"></el-table-column>
         <el-table-column prop="teacher" label="教师" width="180"></el-table-column>
         <el-table-column prop="time" label="时间"></el-table-column>
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import Aside from "../public/aside.vue";
+
 
 export default {
   data() {
@@ -73,17 +73,18 @@ export default {
     };
   },
   components: {
-    Aside,
+   
   },
 };
 </script>
 <style lang="less" scoped>
 .schedule_container {
-  overflow: hidden;
+
   .schedule_wrap {
+    margin-top: 20px;
     .table {
       padding: 10px;
-      float: right;
+    
     }
   }
 }

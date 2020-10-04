@@ -1,9 +1,11 @@
 <template>
   <div id="admin">
     <el-container>
-      <el-header>Header</el-header>
+      <el-header>选课系统后台管理</el-header>
       <el-container>
-        <el-aside width="200px">Aside</el-aside>
+        <el-aside>
+          <Nav style="height:100%"></Nav>
+        </el-aside>
         <el-container>
           <el-main>Main</el-main>
           <el-footer>Footer</el-footer>
@@ -13,13 +15,25 @@
   </div>
 </template>
 <script>
+import Nav from "../admin/nav.vue";
 export default {
   data() {
     return {};
   },
+  components: {
+    Nav,
+  },
 };
 </script>
 <style lang="less" scoped>
+#admin {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  .el-container {
+    height: 100%;
+  }
+}
 .el-header,
 .el-footer {
   background-color: #b3c0d1;

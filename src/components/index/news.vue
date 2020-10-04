@@ -1,11 +1,10 @@
 <template>
   <div class="news_container">
-    <Aside style="float:left"></Aside>
-    <div class="news_list" style="float:right">
+    <div class="news_list">
       <el-timeline>
         <el-timeline-item timestamp="2018/4/12" placement="top">
           <el-card>
-            <h4>公共选修课补选</h4>
+            <h4 @click="getDetails()">公共选修课补选</h4>
             <p>admin 发布于 2018/4/12 20:46</p>
           </el-card>
         </el-timeline-item>
@@ -26,25 +25,31 @@
   </div>
 </template>
 <script>
-import Aside from "../public/aside.vue";
 export default {
   data() {
     return {};
   },
-  methods: {},
-  created() {},
-  components: {
-    Aside,
+  methods: {
+    getDetails() {
+      this.$router.push("/main/news/newsdetails");
+    },
   },
+  created() {},
+  components: {},
 };
 </script>
 <style lang="less" soped>
-.news_container{
-    overflow: hidden;
-    .news_list{
-        // border: 1px solid red;
-        width: 70%;
-        padding: 10px;
+.news_container {
+  .news_list {
+    
+    padding: 10px;
+    ul{
+      padding: 0;
+      margin: 0;
+      h4{
+        cursor: pointer;
+      }
     }
+  }
 }
 </style>

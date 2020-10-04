@@ -6,6 +6,7 @@
         <img src="@/assets/logo.png" alt />
       </div>
       <!-- 表单 -->
+
       <el-form
         ref="loginFormRef"
         label-width="0px"
@@ -13,8 +14,12 @@
         :model="loginForm"
         :rules="loginFormRules"
       >
-        <el-form-item prop="username">
-          <el-input placeholder="用户名" v-model="loginForm.username" prefix-icon="el-icon-user-solid"></el-input>
+        <el-form-item prop="sno">
+          <el-input
+            placeholder="用户名"
+            v-model="loginForm.sno"
+            prefix-icon="el-icon-user-solid"
+          ></el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input
@@ -25,7 +30,9 @@
           ></el-input>
         </el-form-item>
         <el-form-item class="btns">
-          <el-button type="primary" @click="login">学生登陆</el-button>
+          <el-button type="primary" @click="login('loginFormRef')"
+            >学生登陆</el-button
+          >
           <el-button type="info" @click="reset">重置</el-button>
         </el-form-item>
       </el-form>
@@ -39,11 +46,11 @@ export default {
   data() {
     return {
       loginForm: {
-        username: "",
-        password: "",
+        sno: "20712420006",
+        password: "888888",
       },
       loginFormRules: {
-        username: [
+        sno: [
           {
             required: true,
             message: "请输入学号",
@@ -69,12 +76,38 @@ export default {
     };
   },
   methods: {
-    login() {
-      this.$refs.loginFormRef.validate((valid) => {
-        if (!valid) {
-          this.Checkfailure();
+    loginFail() {
+      this.$message({
+        message: "账号或密码错误",
+        type: "warning",
+      });
+    },
+    login(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.$http.post("/api/login", this.loginForm).then((res) => {
+            console.log(res.data);
+            if (res.data.status === 0) {
+              localStorage.setItem("studentToken", res.data.token);
+              this.$message({
+                message: "欢迎您，" + res.data.user.username,
+                type: "success",
+              });
+              this.$router.push({
+                path: "/main",
+                query: {
+                  user: res.data.user.sno,
+                },
+              });
+            } else if (res.data.status === 1) {
+              this.loginFail();
+            } else {
+              console.log(res.data.msg);
+              return false;
+            }
+          });
         } else {
-          this.$router.push("/main");
+          this.Checkfailure();
         }
       });
     },
@@ -85,6 +118,7 @@ export default {
       this.$message.error("休想逃过预校检");
     },
   },
+  created() {},
 };
 </script>
 <style lang="less" scoped>
