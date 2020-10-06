@@ -2,7 +2,11 @@
   <div class="home_container">
     <div class="course_container">
       <h3>已选课程</h3>
-      <el-table :data="selectedcourse" style="width: 100%" max-height="100%">
+      <el-table
+        :data="selectedcourse"
+        style="width: 100%"
+        max-height="100%"
+      >
         <el-table-column
           fixed
           prop="cid"
@@ -61,7 +65,12 @@
       </el-form>
       <hr />
       <h3>所有课程</h3>
-      <el-table :data="tables" style="width: 100%" max-height="100%">
+      <el-table
+        v-loading="loading"
+        :data="tables"
+        style="width: 100%"
+        max-height="100%"
+      >
         <el-table-column
           fixed
           prop="cid"
@@ -155,6 +164,8 @@ export default {
       currentPage: 0,
       //选课提交
       currentCourse: {},
+      //加载提示
+      loading: true,
     };
   },
   components: {},
@@ -181,7 +192,7 @@ export default {
       this.currentCourse = course;
       delete this.currentCourse._id;
       this.currentCourse.sno = this.$route.query.user;
-      console.log(course)
+      console.log(course);
       var flag = this.selectedcourse.findIndex(this.Finddup) == -1;
       if (course.per !== 100) {
         if (flag === true) {
@@ -196,6 +207,7 @@ export default {
           this.reload();
           this.$http.get("/api/getSelectedCourse/" + this.sno).then((res) => {
             this.selectedcourse = res.data.selCourse;
+            this.loading = false;
           });
         } else {
           this.$message({
@@ -225,8 +237,9 @@ export default {
   },
   created() {
     this.$http.get("/api/getAllCourse").then((res) => {
-      console.log(res.data.courses)
+      console.log(res.data.courses);
       this.Allcourse = res.data.courses;
+      this.loading = !this.loading;
       //给所有课程计算选课进度
       for (let j = 0; j < this.Allcourse.length; j++) {
         this.Allcourse[j].per =
@@ -245,6 +258,7 @@ export default {
     });
     this.$http.get("/api/getSelectedCourse/" + this.sno).then((res) => {
       this.selectedcourse = res.data.selCourse;
+      this.loading = false;
     });
   },
   computed: {

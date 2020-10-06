@@ -88,7 +88,7 @@ export default {
           this.$http.post("/api/login", this.loginForm).then((res) => {
             console.log(res.data);
             if (res.data.status === 0) {
-              localStorage.setItem("studentToken", res.data.token);
+              sessionStorage.setItem("studentToken", res.data.token);
               this.$message({
                 message: "欢迎您，" + res.data.user.username,
                 type: "success",

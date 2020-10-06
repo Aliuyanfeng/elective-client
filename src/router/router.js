@@ -51,13 +51,10 @@ export default new Router({
       }, {
         path: '/main/classifyAnalyse',
         component: resolve => (require(['@/components/index/classifyAnalyse.vue'], resolve))
-      },{
+      }, {
         path: '/main/moduleAnalyse',
         component: resolve => (require(['@/components/index/moduleAnalyse.vue'], resolve))
       }]
-    }, {
-      path: '/admin',
-      component: resolve => (require(['@/components/admin/admin.vue'], resolve)),
     }, {
       path: '/*',
       name: 'Error',
@@ -74,17 +71,24 @@ router.beforeEach((to, from, next) => {
     next(); //如果匹配到正确跳转
   }
 
+  //user
+
+
   //token
-  if (to.path === '/login') { //若要跳转的页面是登录界面
+  if (to.path === '/login' || to.path === '/alogin') { //若要跳转的页面是登录界面
     next(); //直接跳转
   } else {
-    let token = localStorage.getItem('studentToken'); //获取本地存储的token值
+    let token = sessionStorage.getItem('studentToken'); //获取本地存储的token值
     if (token === null || token === '') { //若token为空则验证不成功，跳转到登录页面
-      Message.error('token失效')
+      Message.error('请先登录')
       next('/login');
     } else { //不为空则验证成功
       next();
     }
   }
+
+
+
+
 
 })

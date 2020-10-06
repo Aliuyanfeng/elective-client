@@ -25,7 +25,7 @@
       <el-menu-item index="/main/news">动态</el-menu-item>
       <el-menu-item index="/main/schedule">课表</el-menu-item>
       <el-menu-item index="/main/record">选课记录</el-menu-item>
-      <el-submenu>
+      <el-submenu index="/main/classifyAnalyse">
         <template slot="title">图表分析</template>
         <el-menu-item index="/main/classifyAnalyse">分类分析</el-menu-item>
         <el-menu-item index="/main/moduleAnalyse">模块分析</el-menu-item>
@@ -69,7 +69,7 @@ export default {
       });
     },
     logout() {
-      localStorage.removeItem("studentToken");
+      sessionStorage.removeItem("studentToken");
       window.location.href = "/";
     },
   },
