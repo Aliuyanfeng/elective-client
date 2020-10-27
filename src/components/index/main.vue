@@ -32,12 +32,22 @@
       </el-submenu>
 
       <el-row class="userInfo">
-        <el-button type="primary">{{ user }}</el-button>
+        <el-dropdown>
+          <el-button type="primary">
+            {{ user }}<i class="el-icon-arrow-down el-icon--right"></i>
+          </el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>姓名：{{student.username}}</el-dropdown-item>
+            <el-dropdown-item>班级：{{student.class}}</el-dropdown-item>
+            <el-dropdown-item>专业：{{student.major}}</el-dropdown-item>
+            <el-dropdown-item>学院：{{student.institute}}</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
         <el-button type="primary" @click="logout">退出</el-button>
       </el-row>
     </el-menu>
     <div style="overflow: hidden">
-      <Aside style="float: left"></Aside>
+      <Aside style="float: left" v-if="isAsideAlive"></Aside>
       <router-view style="float: right; width: 75%" v-if="isRouterAlive">
       </router-view>
     </div>
@@ -52,13 +62,16 @@ export default {
   provide() {
     return {
       reload: this.reload,
+      areload: this.areload,
     };
   },
   data() {
     return {
       ip: "",
       user: this.$route.query.user,
+      student: {},
       isRouterAlive: true,
+      isAsideAlive: true,
     };
   },
   methods: {
@@ -68,6 +81,12 @@ export default {
         this.isRouterAlive = true;
       });
     },
+    areload() {
+      this.isAsideAlive = false;
+      this.$nextTick(function () {
+        this.isAsideAlive = true;
+      });
+    },
     logout() {
       sessionStorage.removeItem("studentToken");
       window.location.href = "/";
@@ -75,6 +94,11 @@ export default {
   },
   created() {
     // console.log(returnCitySN["cip"] + "," + returnCitySN["cname"]);
+    this.$http.get("/api/getStudentInfo/" + this.user).then((res) => {
+      if (res.data.status === 0) {
+        this.student = res.data.student;
+      }
+    });
   },
   components: {
     Footer,

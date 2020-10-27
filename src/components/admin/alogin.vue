@@ -6,12 +6,20 @@
         <img src="@/assets/logo.png" alt />
       </div>
       <!-- 表单 -->
-      <el-form label-width="0px" class="login-form">
+      <el-form label-width="0px" class="login-form" :model="aloginForm">
         <el-form-item>
-          <el-input placeholder="管理员" prefix-icon="el-icon-user-solid"></el-input>
+          <el-input
+            placeholder="管理员"
+            prefix-icon="el-icon-user-solid"
+            v-model="aloginForm.username"
+          ></el-input>
         </el-form-item>
         <el-form-item>
-          <el-input placeholder="密码" prefix-icon="el-icon-lock"></el-input>
+          <el-input
+            placeholder="密码"
+            prefix-icon="el-icon-lock"
+            v-model="aloginForm.password"
+          ></el-input>
         </el-form-item>
         <el-form-item class="btns">
           <el-button type="primary" @click="alogin">管理员登陆</el-button>
@@ -24,13 +32,28 @@
 </template>
 <script>
 import Footer from "@/components/public/footer.vue";
+import AdminVue from "../../pages/admin/Admin.vue";
 export default {
   data() {
-    return {};
+    return {
+      aloginForm: {
+        username: "admin",
+        password: "admin",
+      },
+    };
   },
   methods: {
     alogin() {
-      this.$router.push("/admin");
+      this.$http.post("/api/admin/alogin", this.aloginForm).then((res) => {
+        console.log(res.data);
+        if (res.data.status == 0) {
+          sessionStorage.setItem("adminToken", res.data.token);
+          this.$message.success("欢迎回来 admin");
+          this.$router.push({ path: "/admin" });
+        }else if(res.data.status == 422){
+          this.$message.error('账号或密码错误')
+        }
+      });
     },
   },
 };
@@ -43,7 +66,7 @@ export default {
   .login_box {
     width: 450px;
     height: 300px;
-    background-color: #fff;
+    background-color: #ffffff;
     border-radius: 5px;
     position: absolute;
     left: 50%;
@@ -60,7 +83,7 @@ export default {
       left: 50%;
       margin-left: -65px;
       margin-top: -65px;
-      background-color: #fff;
+      background-color: #cccccc;
       img {
         width: 100%;
         height: 100%;

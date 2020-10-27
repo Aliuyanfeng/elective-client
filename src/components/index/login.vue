@@ -97,6 +97,8 @@ export default {
                 path: "/main",
                 query: {
                   user: res.data.user.sno,
+                  major: res.data.user.major,
+                  institute: res.data.user.institute,
                 },
               });
             } else if (res.data.status === 1) {

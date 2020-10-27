@@ -2,22 +2,15 @@
   <div class="news_container">
     <div class="news_list">
       <el-timeline>
-        <el-timeline-item timestamp="2018/4/12" placement="top">
+        <el-timeline-item
+          timestamp="2018/4/12"
+          placement="top"
+          v-for="(item, i) in AllArticle"
+          :key="i"
+        >
           <el-card>
-            <h4 @click="getDetails()">公共选修课补选</h4>
+            <h4 @click="getDetails(item._id)">{{ item.title }}</h4>
             <p>admin 发布于 2018/4/12 20:46</p>
-          </el-card>
-        </el-timeline-item>
-        <el-timeline-item timestamp="2018/4/3" placement="top">
-          <el-card>
-            <h4>更新 Github 模板</h4>
-            <p>王小虎 提交于 2018/4/3 20:46</p>
-          </el-card>
-        </el-timeline-item>
-        <el-timeline-item timestamp="2018/4/2" placement="top">
-          <el-card>
-            <h4>更新 Github 模板</h4>
-            <p>王小虎 提交于 2018/4/2 20:46</p>
           </el-card>
         </el-timeline-item>
       </el-timeline>
@@ -27,26 +20,38 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      AllArticle: [],
+    };
   },
   methods: {
-    getDetails() {
-      this.$router.push("/main/news/newsdetails");
+    getDetails(id) {
+      this.$router.push({
+        path: "/main/news/newsdetails",
+        query: {
+          id: id,
+        },
+      });
     },
   },
-  created() {},
+  created() {
+    this.$http.get("/api/admin/getAllArticle").then((res) => {
+      if (res.data.status == 0) {
+        this.AllArticle = res.data.articles;
+      }
+    });
+  },
   components: {},
 };
 </script>
 <style lang="less" soped>
 .news_container {
   .news_list {
-    
     padding: 10px;
-    ul{
+    ul {
       padding: 0;
       margin: 0;
-      h4{
+      h4 {
         cursor: pointer;
       }
     }

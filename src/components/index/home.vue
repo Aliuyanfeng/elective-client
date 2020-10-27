@@ -2,11 +2,7 @@
   <div class="home_container">
     <div class="course_container">
       <h3>已选课程</h3>
-      <el-table
-        :data="selectedcourse"
-        style="width: 100%"
-        max-height="100%"
-      >
+      <el-table :data="selectedcourse" style="width: 100%" max-height="100%">
         <el-table-column
           fixed
           prop="cid"
@@ -71,6 +67,7 @@
         style="width: 100%"
         max-height="100%"
       >
+        <!-- el-table v-loading 可以加载动画 -->
         <el-table-column
           fixed
           prop="cid"
@@ -107,6 +104,11 @@
           label="时间地点"
           width="150"
         ></el-table-column>
+        <el-table-column
+          prop="scope"
+          label="适合范围"
+          width="150"
+        ></el-table-column>
         <el-table-column label="所选人数" width="150">
           <template slot-scope="scope">
             <el-progress
@@ -118,6 +120,13 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作">
           <template slot-scope="scope">
+            <el-button
+              type="primary"
+              size="small"
+              @click="details(scope.row)"
+              icon="el-icon-reading"
+              circle
+            ></el-button>
             <el-button
               type="success"
               size="small"
@@ -137,6 +146,93 @@
         @next-click="nextPage()"
       >
       </el-pagination>
+      <el-dialog
+        title="课程详情"
+        :visible.sync="dialogVisible"
+        width="30%"
+        :before-close="handleClose"
+      >
+        <el-form label-width="80px" label-position="right" class="details_wrap">
+          <el-form-item class="details_item">
+            <span slot="label">
+              <span class="span-box">
+                <span>课程名称:</span>
+                <i class="el-icon-tickets ico-pre"></i>
+              </span>
+            </span>
+            <el-row border="true">{{ this.courseDetails.cname }}</el-row>
+          </el-form-item>
+          <el-form-item class="details_item">
+            <span slot="label">
+              <span class="span-box">
+                <span>课程介绍:</span>
+                <i class="el-icon-notebook-2 ico-pre"></i>
+              </span>
+            </span>
+            <el-row>{{ this.courseDetails.introduce }}</el-row>
+          </el-form-item>
+          <el-form-item class="details_item">
+            <span slot="label">
+              <span class="span-box">
+                <span>课程老师:</span>
+                <i class="el-icon-user ico-pre"></i>
+              </span>
+            </span>
+            <el-row>{{ this.courseDetails.teacher }}</el-row>
+          </el-form-item>
+          <el-form-item class="details_item">
+            <span slot="label">
+              <span class="span-box">
+                <span>课程学分:</span>
+                <i class="el-icon-s-flag ico-pre"></i>
+              </span>
+            </span>
+            <el-row>{{ this.courseDetails.credit }}</el-row>
+          </el-form-item>
+          <el-form-item class="details_item">
+            <span slot="label">
+              <span class="span-box">
+                <span>课程学时:</span>
+                <i class="el-icon-time ico-pre"></i>
+              </span>
+            </span>
+            <el-row>{{ this.courseDetails.period }}</el-row>
+          </el-form-item>
+          <el-form-item class="details_item">
+            <span slot="label">
+              <span class="span-box">
+                <span>开办学校:</span>
+                <i class="el-icon-school ico-pre"></i>
+              </span>
+            </span>
+            <el-row>{{ this.courseDetails.school }}</el-row>
+          </el-form-item>
+          <el-form-item class="details_item">
+            <span slot="label">
+              <span class="span-box">
+                <span>开办年份:</span>
+                <i class="el-icon-price-tag ico-pre"></i>
+              </span>
+            </span>
+            <el-row>{{ this.courseDetails.year }}</el-row>
+          </el-form-item>
+          <el-form-item class="details_item">
+            <span slot="label">
+              <span class="span-box">
+                <span>课程目标:</span>
+                <i class="el-icon-aim ico-pre"></i>
+              </span>
+            </span>
+            <el-row>{{ this.courseDetails.objective }}</el-row>
+          </el-form-item>
+        </el-form>
+
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false" type="primary"
+            >退 出</el-button
+          >
+        </span>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -146,6 +242,8 @@ export default {
   data() {
     return {
       sno: this.$route.query.user,
+      major: this.$route.query.major,
+      institute: this.$route.query.institute,
       //搜索关键字
       keywords: "",
       //后台传过来的所有课程
@@ -166,24 +264,45 @@ export default {
       currentCourse: {},
       //加载提示
       loading: true,
+      //dialog显示
+      dialogVisible: false,
+      //课程详情
+      courseDetails: {},
     };
   },
   components: {},
   methods: {
     async del(course) {
       console.log(course);
-      await this.$http.post("/api/delSelectedCourse", course).then((res) => {
-        if (res.data.status == 0) {
-          this.$message({
-            message: "删除成功！",
-            type: "success",
+      await this.$http
+        .post("/api/delSelectedCourse", course)
+        .then((res) => {
+          if (res.data.status == 0) {
+            this.$message({
+              message: "删除成功！",
+              type: "success",
+            });
+          }
+        })
+        .then(() => {
+          this.$http.get("/api/getSelectedCourse/" + this.sno).then((res) => {
+            this.selectedcourse = res.data.selCourse;
           });
-        }
-      });
-      await this.$http.get("/api/getSelectedCourse/" + this.sno).then((res) => {
-        this.selectedcourse = res.data.selCourse;
-      });
-      await this.reload();
+          this.reload();
+          this.loading = false;
+        });
+    },
+    details(course) {
+      console.log(course);
+      this.dialogVisible = true;
+      this.courseDetails = course;
+    },
+    handleClose(done) {
+      this.$confirm("确认关闭？")
+        .then((_) => {
+          done();
+        })
+        .catch((_) => {});
     },
     Finddup(course) {
       return course.cid == this.currentCourse.cid;
@@ -194,30 +313,37 @@ export default {
       this.currentCourse.sno = this.$route.query.user;
       console.log(course);
       var flag = this.selectedcourse.findIndex(this.Finddup) == -1;
-      if (course.per !== 100) {
-        if (flag === true) {
-          this.$http
-            .post("/api/selectCourse", this.currentCourse)
-            .then((res) => {
-              this.$message({
-                message: "选课成功！",
-                type: "success",
+      if (this.institute == course.scope) {
+        if (course.per !== 100) {
+          if (flag === true) {
+            this.$http
+              .post("/api/selectCourse", this.currentCourse)
+              .then((res) => {
+                this.$message({
+                  message: "选课成功！",
+                  type: "success",
+                });
               });
+            this.reload();
+            this.$http.get("/api/getSelectedCourse/" + this.sno).then((res) => {
+              this.selectedcourse = res.data.selCourse;
+              this.loading = false;
             });
-          this.reload();
-          this.$http.get("/api/getSelectedCourse/" + this.sno).then((res) => {
-            this.selectedcourse = res.data.selCourse;
-            this.loading = false;
-          });
+          } else {
+            this.$message({
+              message: "不可以重复！",
+              type: "warning",
+            });
+          }
         } else {
           this.$message({
-            message: "不可以重复！",
+            message: "人数已满！",
             type: "warning",
           });
         }
       } else {
         this.$message({
-          message: "人数已满！",
+          message: "该课程不适合您",
           type: "warning",
         });
       }
@@ -237,24 +363,25 @@ export default {
   },
   created() {
     this.$http.get("/api/getAllCourse").then((res) => {
-      console.log(res.data.courses);
-      this.Allcourse = res.data.courses;
-      this.loading = !this.loading;
-      //给所有课程计算选课进度
-      for (let j = 0; j < this.Allcourse.length; j++) {
-        this.Allcourse[j].per =
-          (this.Allcourse[j].selnum / this.Allcourse[j].maxnum) * 100;
+      if (res.data.status == 0) {
+        this.Allcourse = res.data.courses;
+        //给所有课程计算选课进度
+        for (let j = 0; j < this.Allcourse.length; j++) {
+          this.Allcourse[j].per =
+            (this.Allcourse[j].selnum / this.Allcourse[j].maxnum) * 100;
+        }
+        //计算页数
+        this.pageNum = Math.ceil(this.Allcourse.length / this.pageSize) || 1;
+        for (let i = 0; i < this.pageNum; i++) {
+          this.totalPage[i] = this.Allcourse.slice(
+            this.pageSize * i,
+            this.pageSize * (i + 1)
+          );
+        }
+        //默认显示第一页
+        this.dataShow = this.totalPage[this.currentPage];
+        this.loading = false;
       }
-      //计算页数
-      this.pageNum = Math.ceil(this.Allcourse.length / this.pageSize) || 1;
-      for (let i = 0; i < this.pageNum; i++) {
-        this.totalPage[i] = this.Allcourse.slice(
-          this.pageSize * i,
-          this.pageSize * (i + 1)
-        );
-      }
-      //默认显示第一页
-      this.dataShow = this.totalPage[this.currentPage];
     });
     this.$http.get("/api/getSelectedCourse/" + this.sno).then((res) => {
       this.selectedcourse = res.data.selCourse;
@@ -276,12 +403,32 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped>
+<style lang="less">
 .home_container {
   .course_container {
     padding: 10px;
     border: 1px solid #cccccc;
     border-radius: 5px;
+    .details_item {
+      .span-box {
+        display: inline-block;
+        position: relative;
+      }
+      .ico-pre {
+        position: absolute;
+        left: -15px;
+        top: 12px;
+      }
+      .el-form-item__label {
+        font-weight: bolder;
+      }
+      .el-row {
+        border: 1px solid #333333;
+        border-radius: 5px;
+        padding: 0px 5px;
+        box-shadow: 0 1px 3px 1px gray;
+      }
+    }
   }
 }
 </style>
