@@ -16,7 +16,7 @@
           <el-main>
             <router-view v-if="isAlive"></router-view>
           </el-main>
-          <el-footer>Footer</el-footer>
+          <el-footer>高校选课系统后台管理 - Powered By Aliuyanfeng V1.0</el-footer>
         </el-container>
       </el-container>
     </el-container>

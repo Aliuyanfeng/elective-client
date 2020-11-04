@@ -21,16 +21,6 @@ export default {
         }
       });
     },
-
-    auto() {
-      setInterval(() => {
-        if (this.active++ > 2) {
-          this.active = 3;
-        } else {
-          this.active++;
-        }
-      }, 5000);
-    },
   },
   created() {
     // this.auto();

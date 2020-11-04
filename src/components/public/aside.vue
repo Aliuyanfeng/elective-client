@@ -61,13 +61,18 @@ export default {
         var hour = Math.floor((ResTime / 1000 / 60 / 60) % 24);
         var min = Math.floor((ResTime / 1000 / 60) % 60);
         var sec = Math.floor((ResTime / 1000) % 60);
-        this.residue.day = day;
-        this.residue.hour = hour;
-        this.residue.min = min;
-        this.residue.sec = sec;
+        if (sec > 0) {
+          this.residue.day = day;
+          this.residue.hour = hour;
+          this.residue.min = min;
+          this.residue.sec = sec;
+        } else {
+          this.residue.day = this.residue.hour = this.residue.min = this.residue.sec = 0;
+        }
       }, 1000);
     },
     newsdetails(id) {
+      
       this.$router.push({
         path: "/main/news/newsdetails",
         query: { id: id },

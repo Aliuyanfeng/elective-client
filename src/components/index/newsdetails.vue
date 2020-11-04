@@ -5,7 +5,7 @@
         <h2>{{ currentNews.title }}</h2>
         <p>
           发布时间:{{ currentNews.ctime | dateFormat("YYYY-MM-DD HH:mm:ss") }}
-          <span style="margin-left:10px">点击量:0</span>
+          <span style="margin-left: 10px">点击量:{{currentNews.read}}</span>
         </p>
         <el-divider></el-divider>
       </div>
@@ -21,15 +21,26 @@ export default {
       currentNews: {},
     };
   },
-  methods: {},
+  methods: {
+    getArticleById() {
+      this.$http
+        .get("/api/admin/getArticleById/" + this.$route.query.id)
+        .then((res) => {
+          if (res.data.status == 0) {
+            this.currentNews = res.data.article;
+          }
+        });
+    },
+  },
   created() {
-    this.$http
-      .get("/api/admin/getArticleById/" + this.$route.query.id)
-      .then((res) => {
-        if (res.data.status == 0) {
-          this.currentNews = res.data.article;
-        }
-      });
+    this.getArticleById()
+  },
+  watch: {
+    $route(to,form){
+      if(this.$route.query.id){
+        this.getArticleById()
+      }
+    }
   },
   components: {},
 };
@@ -37,8 +48,6 @@ export default {
 <style lang="less" soped>
 .details_container {
   .details_wrap {
-    // border: 1px solid red;
-
     padding: 10px;
     .title {
       background-color: #fff;
@@ -52,7 +61,6 @@ export default {
     }
     .article {
       margin-top: 30px;
-      // box-shadow: 0px 0px 5px 2px gray;
       font-size: 1rem;
       line-height: 1.5em;
       text-indent: 2em;
