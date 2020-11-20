@@ -118,7 +118,6 @@ export default {
   created() {
     this.$http.get("/api/admin/getAllStudent").then((res) => {
       if (res.data.status === 0) {
-        console.log(res.data);
         this.studentData = res.data.students;
         //计算页数
         this.pageNum = Math.ceil(this.studentData.length / this.pageSize) || 1;
@@ -139,7 +138,10 @@ export default {
       const keyword = this.search;
       if (keyword) {
         return this.studentData.filter((data) => {
+          console.log(data);
           return Object.keys(data).some((key) => {
+            // console.log(key)
+            console.log(String(data[key]));
             return String(data[key]).toLowerCase().indexOf(keyword) > -1;
           });
         });
